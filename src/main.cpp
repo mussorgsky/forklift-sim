@@ -69,7 +69,7 @@ int main(/* int argc, char *argv[] */)
 
     float error = 0.0f;
 
-    window.setView(sf::View(Vector2f(0.0f, 0.0f), Vector2f(200.0f, 100.0f) * 2.0f));
+    window.setView(sf::View(Vector2f(-30.0f, 0.0f), Vector2f(200.0f, 100.0f) * 2.0f));
 
     while (window.isOpen())
     {
