@@ -24,16 +24,17 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 	@echo "Linking complete"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+	@mkdir -p $(OBJDIR) $(BINDIR)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@echo "Compiled "$<" successfully"
 
 .PHONY: clean
 clean:
-	@$(rm) $(OBJECTS)
+	@$(rm) -r $(OBJDIR)
 	@echo "Cleanup complete"
 
 .PHONY: remove
 remove: clean
-	@$(rm) $(BINDIR)/$(TARGET)
+	@$(rm) -r $(BINDIR)
 	@echo "Executable removed"
 
