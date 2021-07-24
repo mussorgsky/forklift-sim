@@ -1,3 +1,6 @@
+#include <random>
+#include <algorithm>
+
 #include "Roadmaker.hpp"
 
 Roadmaker::Roadmaker()
@@ -89,4 +92,41 @@ vector<RectangleShape> Roadmaker::createShapes()
     road_segments.clear();
 
     return result;
+}
+
+void Roadmaker::generateSegments(RoadConfig const config)
+{
+    std::random_device rd;
+    std::mt19937 engine(rd());
+    std::uniform_real_distribution<float> radius(config.radius_min, config.radius_max);
+    std::uniform_real_distribution<float> length(config.length_min, config.length_max);
+    std::uniform_real_distribution<float> angle(config.angle_min, config.angle_max);
+
+    if (config.lead_in)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::STRAIGHT, config.lead_length));
+    }
+
+    for (unsigned int i = 0; i < config.turns_left; ++i)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::TURN_LEFT, 0.0f, radius(engine), angle(engine)));
+    }
+    for (unsigned int i = 0; i < config.turns_right; ++i)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::TURN_RIGHT, 0.0f, radius(engine), angle(engine)));
+    }
+    for (unsigned int i = 0; i < config.straights; ++i)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::STRAIGHT, length(engine)));
+    }
+    for (unsigned int i = 0; i < config.skips; ++i)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::SKIP, length(engine)));
+    }
+    std::random_shuffle(road_segments.begin() + (config.lead_in ? 1 : 0), road_segments.end());
+
+    if (config.lead_out)
+    {
+        road_segments.push_back(RoadSegment(SegmentType::STRAIGHT, config.lead_length));
+    }
 }

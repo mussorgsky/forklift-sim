@@ -19,8 +19,8 @@ public:
     {
     }
 
-    const SegmentType type;
-    const float length;
-    const float radius;
-    const float degrees;
+    SegmentType type;
+    float length;
+    float radius;
+    float degrees;
 };
