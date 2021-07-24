@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Help.hpp"
+#include "RoadSegment.hpp"
 
 using sf::RectangleShape;
 using sf::Vector2f;
@@ -15,18 +16,18 @@ using std::vector;
 
 class Roadmaker
 {
-  private:
-	vector<string> segments;
+private:
+	vector<RoadSegment> road_segments;
 	Vector2f position;
 	float rotation;
 
-	bool checkValidity(string segment);
-	void createStraight(string segment, vector<RectangleShape> *shapes);
-	void createTurn(string segment, vector<RectangleShape> *shapes);
-	void createSkip(string segment);
+	void createStraight(RoadSegment const &, vector<RectangleShape> &);
+	void createSkip(RoadSegment const &);
+	void createTurn(RoadSegment const &, vector<RectangleShape> &);
 
-  public:
+public:
 	Roadmaker();
 	bool addSegment(string newSegment);
+	void addSegment(RoadSegment newSegment);
 	vector<RectangleShape> createShapes();
 };

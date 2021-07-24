@@ -45,23 +45,23 @@ int main(/* int argc, char *argv[] */)
 
     Roadmaker gddkia;
 
-    gddkia.addSegment("tr 0 5");
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 0.0, 5.0));
 
-    gddkia.addSegment("s 20");
-    gddkia.addSegment("tl 20 95");
-    gddkia.addSegment("s 5");
-    gddkia.addSegment("tl 20 180");
-    gddkia.addSegment("s 5");
-    gddkia.addSegment("tr 20 90");
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 20.0));
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 95.0));
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 180.0));
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 20.0, 90.0));
 
-    gddkia.addSegment("s 25");
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 25.0));
 
-    gddkia.addSegment("tr 20 90");
-    gddkia.addSegment("s 5");
-    gddkia.addSegment("tl 20 180");
-    gddkia.addSegment("s 5");
-    gddkia.addSegment("tl 20 95");
-    gddkia.addSegment("s 20");
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 20.0, 90.0));
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 180.0));
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
+    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 95.0));
+    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 20.0));
 
     vector<RectangleShape> lines = gddkia.createShapes();
 

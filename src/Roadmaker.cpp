@@ -6,113 +6,78 @@ Roadmaker::Roadmaker()
     rotation = 0.0f;
 }
 
-bool Roadmaker::checkValidity(string segment)
+void Roadmaker::addSegment(RoadSegment newSegment)
 {
-    return true;
+    road_segments.push_back(newSegment);
 }
 
-bool Roadmaker::addSegment(string newSegment)
+void Roadmaker::createStraight(RoadSegment const &segment, vector<RectangleShape> &shapes)
 {
-    if (checkValidity(newSegment))
-    {
-        segments.push_back(newSegment);
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    RectangleShape shape = RectangleShape(Vector2f(segment.length, 1.9f));
+    shape.setFillColor(sf::Color::Black);
+    shape.setOrigin(shape.getSize() * 0.5f);
+    shape.setPosition(position + help::rotateByDeg(Vector2f(shape.getSize().x * 0.5f, 0.0f), rotation));
+    shape.setRotation(rotation);
+    position += help::rotateByDeg(Vector2f(shape.getSize().x, 0.0f), rotation);
+
+    shapes.push_back(shape);
 }
 
-void Roadmaker::createStraight(string segment, vector<RectangleShape> *shapes)
+void Roadmaker::createSkip(RoadSegment const &segment)
 {
-    // "s100"
-    float length = stof(segment.substr(1));
-    RectangleShape newOne = RectangleShape(Vector2f(length, 1.9f));
-
-    newOne.setFillColor(sf::Color::Black);
-    newOne.setOrigin(newOne.getSize() * 0.5f);
-
-    newOne.setPosition(position + help::rotateByDeg(Vector2f(newOne.getSize().x * 0.5f, 0.0f), rotation));
-    newOne.setRotation(rotation);
-
-    position += help::rotateByDeg(Vector2f(newOne.getSize().x, 0.0f), rotation);
-
-    shapes->push_back(newOne);
+    position += help::rotateByDeg(Vector2f(1.0f, 0.0f) * segment.length, rotation);
 }
 
-void Roadmaker::createTurn(string segment, vector<RectangleShape> *shapes)
+void Roadmaker::createTurn(RoadSegment const &segment, vector<RectangleShape> &shapes)
 {
-    // "tl 50 90"
-    char direction = segment[1];
-    float sign = (direction == 'l' ? -1.0f : 1.0f);
+    float const sign = (segment.type == SegmentType::TURN_LEFT) ? -1.0f : 1.0f;
 
-    string::size_type degStart;
-
-    segment = segment.substr(2);
-
-    float radius = stof(segment, &degStart);
-    float degrees = stof(segment.substr(degStart));
-
-    const float step = 5.0f;
-    int count = degrees / step;
-    float length = 2.0f * 3.1415f * radius * (step / 360.0f);
+    float const step = 5.0f;
+    int const count = segment.degrees / step;
+    float const length = 2.0f * 3.1415f * segment.radius * (step / 360.0f);
 
     RectangleShape newOne = RectangleShape(Vector2f(length, 1.9f));
     newOne.setFillColor(sf::Color(16, 16, 16));
     newOne.setOrigin(newOne.getSize() * 0.5f);
 
-    std::cout << rotation << '\t' << degrees << '\t';
-
-    Vector2f turnCenter = Vector2f(position + help::rotateByDeg(Vector2f(radius, 0.0f), rotation + sign * 90.0f));
+    Vector2f const turnCenter = Vector2f(position + help::rotateByDeg(Vector2f(segment.radius, 0.0f), rotation + sign * 90.0f));
 
     for (int i = 0; i < count; i++)
     {
-        float x = help::cosineDeg(rotation + sign * (i + 0.5f - 90.0f) * step) * radius;
-        float y = help::sineDeg(rotation + sign * (i + 0.5f - 90.0f) * step) * radius;
-        //     // float x = help::sineDeg(sign * rotation - sign * (i + 0.5f) * step);
-        //     // float y = help::cosineDeg(sign * rotation - sign * (i + 0.5f) * step);
+        float x = help::cosineDeg(rotation + sign * (i + 0.5f - 90.0f) * step) * segment.radius;
+        float y = help::sineDeg(rotation + sign * (i + 0.5f - 90.0f) * step) * segment.radius;
         Vector2f offset = Vector2f(x, y);
 
-        newOne.setPosition(turnCenter + offset); // + offset);
+        newOne.setPosition(turnCenter + offset);
         newOne.setRotation(rotation + sign * (i + 0.5f) * step);
 
-        shapes->push_back(newOne);
+        shapes.push_back(newOne);
     }
 
-    position = turnCenter + help::rotateByDeg(position - turnCenter, sign * degrees);
-    rotation += sign * degrees;
-
-    std::cout << rotation << '\n';
-}
-
-void Roadmaker::createSkip(string segment)
-{
-    // "b 100"
-    float length = stof(segment.substr(1));
-
-    position = position + help::rotateByDeg(Vector2f(1.0f, 0.0f) * length, rotation);
+    position = turnCenter + help::rotateByDeg(position - turnCenter, sign * segment.degrees);
+    rotation += sign * segment.degrees;
 }
 
 vector<RectangleShape> Roadmaker::createShapes()
 {
     vector<RectangleShape> result;
-
-    for (string segment : segments)
+    for (auto &segment : road_segments)
     {
-        switch (segment[0])
+        switch (segment.type)
         {
-        case 's':
-            createStraight(segment, &result);
+        case SegmentType::STRAIGHT:
+            createStraight(segment, result);
             break;
-        case 't':
-            createTurn(segment, &result);
-            break;
-        case 'b':
+
+        case SegmentType::SKIP:
             createSkip(segment);
+            break;
+
+        case SegmentType::TURN_RIGHT:
+        case SegmentType::TURN_LEFT:
+            createTurn(segment, result);
             break;
         }
     }
-
     return result;
 }
