@@ -15,8 +15,8 @@ TO JEST JEDNOZADANIOWY PROGRAM
 
 int main(/* int argc, char *argv[] */)
 {
-    int width = 1024;
-    int height = 512;
+    int width = 800;
+    int height = 800;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 2;
     sf::RenderWindow window(sf::VideoMode(width, height), "Forklift Sim", sf::Style::Default, settings);
@@ -68,8 +68,6 @@ int main(/* int argc, char *argv[] */)
 
     float error = 0.0f;
 
-    window.setView(sf::View(Vector2f(-30.0f, 0.0f), Vector2f(200.0f, 100.0f) * 2.0f));
-
     while (window.isOpen())
     {
         sf::Event event;
@@ -81,11 +79,12 @@ int main(/* int argc, char *argv[] */)
             }
         }
 
-        sf::View camera = sf::View(hero.getPosition(), Vector2f(200.0f, 100.0f) * 2.0f);
-
         float timescale = 1.0f;
         float deltaT = delta.restart().asSeconds() * timescale;
         float elapsedT = elapsed.getElapsedTime().asSeconds() * timescale;
+
+        sf::View camera = sf::View(hero.getPosition(), Vector2f(200.0f, 200.0f) * 2.0f);
+        window.setView(camera);
 
         error = hero.eyes.sense(error);
 
