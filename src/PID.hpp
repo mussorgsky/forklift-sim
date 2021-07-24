@@ -1,11 +1,14 @@
-class PID
-{
-  private:
-    float kP, kI, kD;
-    float p, i, d;
-    float lastError;
+#pragma once
+#include "Controller.hpp"
 
-  public:
-    PID(float kp, float ki, float kd);
-    float update(float error, float dT);
+class PID : public Controller
+{
+private:
+  float kP, kI, kD;
+  float p, i, d;
+  float lastError;
+
+public:
+  PID(float kp, float ki, float kd);
+  float update(ControllerInput const data, float dT) override;
 };

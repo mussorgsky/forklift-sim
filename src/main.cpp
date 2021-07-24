@@ -36,8 +36,7 @@ int main(/* int argc, char *argv[] */)
     sf::Clock elapsed;
 
     Forklift hero = Forklift();
-    // PID controller = PID(10.0f, 0.1f, 1.0f);
-    PID controller = PID(10.0f, 0.25f, 4.0f);
+    std::unique_ptr<Controller> controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
 
     hero.rotateBy(-90.0f);
     hero.moveBy(Vector2f(-35.0f, 0.0f));
@@ -90,7 +89,7 @@ int main(/* int argc, char *argv[] */)
 
         error = hero.eyes.sense(error);
 
-        float steering = controller.update(error, deltaT);
+        float steering = controller->update({error}, deltaT);
 
         hero.drive(0.5f, deltaT);
         hero.steeringTarget = steering + 0.00123f;

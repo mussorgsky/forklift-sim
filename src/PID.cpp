@@ -13,13 +13,13 @@ PID::PID(float kp, float ki, float kd)
     lastError = 0.0f;
 }
 
-float PID::update(float error, float dT)
+float PID::update(ControllerInput const data, float dT)
 {
-    p = error;
-    i += error * dT;
-    d = (error - lastError) / dT;
+    p = data.error;
+    i += data.error * dT;
+    d = (data.error - lastError) / dT;
 
-    lastError = error;
+    lastError = data.error;
 
     return (p * kP) + (i * kI) + (d * kD);
 }
