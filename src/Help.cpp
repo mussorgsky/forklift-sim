@@ -60,5 +60,9 @@ namespace help
 
         return img;
     }
+    float distance(Vector2f const a, Vector2f const b)
+    {
+        return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));
+    }
 
 } // namespace help

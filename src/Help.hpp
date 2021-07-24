@@ -21,4 +21,5 @@ namespace help
     float cosineDeg(float angle);
     bool isInsideRectangle(Vector2f point, RectangleShape rectangle);
     Image makeGridImage(int width, int height);
+    float distance(Vector2f const a, Vector2f const b);
 } // namespace help
