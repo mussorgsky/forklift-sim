@@ -84,5 +84,9 @@ vector<RectangleShape> Roadmaker::createShapes()
             break;
         }
     }
+    position = Vector2f(0.0f, 0.0f);
+    rotation = 0.0f;
+    road_segments.clear();
+
     return result;
 }
