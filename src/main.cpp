@@ -39,34 +39,13 @@ int main(/* int argc, char *argv[] */)
     std::unique_ptr<Controller> controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
 
     hero.rotateBy(-90.0f);
-    hero.moveBy(Vector2f(-35.0f, 0.0f));
     hero.wheels[2].rotation = -5.0f;
 
     Roadmaker gddkia;
-
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 0.0, 5.0));
-
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 20.0));
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 95.0));
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 180.0));
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 20.0, 90.0));
-
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 25.0));
-
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_RIGHT, 0.0, 20.0, 90.0));
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 180.0));
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 5.0));
-    gddkia.addSegment(RoadSegment(SegmentType::TURN_LEFT, 0.0, 20.0, 95.0));
-    gddkia.addSegment(RoadSegment(SegmentType::STRAIGHT, 20.0));
-
-    vector<RectangleShape> lines = gddkia.createShapes();
-
-    hero.eyes.lines = lines;
-
+    RoadConfig config{5, 5, 10, 0, 5.0f, 20.0f, 5.0f, 25.0f, 30.0f, 180.0f, 35.0f, true, true};
+    vector<RectangleShape> lines;
     float error = 0.0f;
+    bool started = false;
 
     while (window.isOpen())
     {
@@ -82,6 +61,27 @@ int main(/* int argc, char *argv[] */)
         float timescale = 1.0f;
         float deltaT = delta.restart().asSeconds() * timescale;
         float elapsedT = elapsed.getElapsedTime().asSeconds() * timescale;
+
+        if (!started || elapsedT > 10.0f)
+        {
+            started = true;
+            hero = Forklift();
+            controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
+
+            hero.rotateBy(-90.0f);
+            hero.wheels[2].rotation = -5.0f;
+
+            unsigned int tries = 0;
+            do
+            {
+                gddkia.generateSegments(config);
+                lines = gddkia.createShapes();
+                tries++;
+            } while (!help::checkNiceTrack(lines, 7.0f));
+            std::cout << "Took " << tries << " tries to get a nice track\n";
+            hero.eyes.lines = lines;
+            elapsed.restart();
+        }
 
         sf::View camera = sf::View(hero.getPosition(), Vector2f(200.0f, 200.0f) * 2.0f);
         window.setView(camera);
