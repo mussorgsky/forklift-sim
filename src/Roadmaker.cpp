@@ -13,14 +13,19 @@ void Roadmaker::addSegment(RoadSegment newSegment)
 
 void Roadmaker::createStraight(RoadSegment const &segment, vector<RectangleShape> &shapes)
 {
-    RectangleShape shape = RectangleShape(Vector2f(segment.length, 1.9f));
-    shape.setFillColor(sf::Color::Black);
-    shape.setOrigin(shape.getSize() * 0.5f);
-    shape.setPosition(position + help::rotateByDeg(Vector2f(shape.getSize().x * 0.5f, 0.0f), rotation));
-    shape.setRotation(rotation);
-    position += help::rotateByDeg(Vector2f(shape.getSize().x, 0.0f), rotation);
+    unsigned int const pieces_count = segment.length / 1.0f;
+    float const piece_length = segment.length / pieces_count;
+    for (unsigned int i = 0; i < pieces_count; ++i)
+    {
+        RectangleShape shape = RectangleShape(Vector2f(piece_length / 2.0f, 1.9f));
+        shape.setFillColor(sf::Color::Black);
+        shape.setOrigin(shape.getSize() * 0.5f);
+        shape.setPosition(position + help::rotateByDeg(Vector2f(shape.getSize().x * 0.5f, 0.0f), rotation));
+        shape.setRotation(rotation);
+        position += help::rotateByDeg(Vector2f(shape.getSize().x, 0.0f), rotation);
 
-    shapes.push_back(shape);
+        shapes.push_back(shape);
+    }
 }
 
 void Roadmaker::createSkip(RoadSegment const &segment)
@@ -32,12 +37,12 @@ void Roadmaker::createTurn(RoadSegment const &segment, vector<RectangleShape> &s
 {
     float const sign = (segment.type == SegmentType::TURN_LEFT) ? -1.0f : 1.0f;
 
-    float const step = 5.0f;
+    float const step = 1.0f;
     int const count = segment.degrees / step;
     float const length = 2.0f * 3.1415f * segment.radius * (step / 360.0f);
 
     RectangleShape newOne = RectangleShape(Vector2f(length, 1.9f));
-    newOne.setFillColor(sf::Color(16, 16, 16));
+    newOne.setFillColor(sf::Color::Black);
     newOne.setOrigin(newOne.getSize() * 0.5f);
 
     Vector2f const turnCenter = Vector2f(position + help::rotateByDeg(Vector2f(segment.radius, 0.0f), rotation + sign * 90.0f));
