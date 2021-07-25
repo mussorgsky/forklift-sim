@@ -84,22 +84,6 @@ void Forklift::drive(float power, float dT)
     }
 }
 
-// void Forklift::turnWheel(float power, float dT)
-// {
-//     const float max = 45.0f;
-//     power = std::min(1.0f, std::max(-1.0f, power));
-//     Wheel *wheel = &wheels[2];
-//     float newRot = wheel->rotation + 90.0f * power * dT;
-//     if (abs(newRot) < max)
-//     {
-//         wheel->rotation = newRot;
-//     }
-//     else
-//     {
-//         wheel->rotation = max * copysignf(1.0f, newRot);
-//     }
-// }
-
 void Forklift::turnWheel(float dT)
 {
     const float difference = steeringTarget - wheels[2].rotation;

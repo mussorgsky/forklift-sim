@@ -117,9 +117,6 @@ int main(/* int argc, char *argv[] */)
         circle.setFillColor(sf::Color::Transparent);
         circle.setOutlineThickness(-1.0f);
         window.draw(circle);
-
-        // std::cout << elapsedT << '\t' << offset << '\n';
-
         window.draw(hero.dot);
 
         hero.shape.setPosition(hero.getPosition());
