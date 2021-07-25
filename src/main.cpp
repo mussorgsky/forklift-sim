@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>
+#include <limits>
+#include <algorithm>
 
 #include "Help.hpp"
 #include "Forklift.hpp"
@@ -47,6 +49,10 @@ int main(/* int argc, char *argv[] */)
     bool started = false;
     Vector2f finish_point;
 
+    float const fixed_timestep = 0.016f;
+    float const target_timewarp = 10.0f;
+    float warped_time = 0.0f;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -58,11 +64,10 @@ int main(/* int argc, char *argv[] */)
             }
         }
 
-        float timescale = 1.0f;
-        float deltaT = delta.restart().asSeconds() * timescale;
-        float elapsedT = elapsed.getElapsedTime().asSeconds() * timescale;
+        float deltaT = delta.restart().asSeconds();
+        float elapsedT = elapsed.getElapsedTime().asSeconds();
 
-        if (!started || elapsedT > 10.0f)
+        if (!started || elapsedT > 6.0f)
         {
             started = true;
             hero = Forklift();
@@ -70,6 +75,8 @@ int main(/* int argc, char *argv[] */)
 
             hero.rotateBy(-90.0f);
             hero.wheels[2].rotation = -5.0f;
+
+            warped_time = 0.0f;
 
             unsigned int tries = 0;
             do
@@ -86,27 +93,26 @@ int main(/* int argc, char *argv[] */)
         sf::View camera = sf::View(hero.getPosition(), Vector2f(200.0f, 200.0f) * 2.0f);
         window.setView(camera);
 
-        if (help::distance(hero.getPosition(), finish_point) < 2.0f)
+        int frameskip = std::max(1, (int)std::ceil((target_timewarp * fixed_timestep) / deltaT));
+        for (int i = 0; i < frameskip; ++i)
         {
-            squared_error = 0.0f;
-            started = false;
-            continue;
+            if (help::distance(hero.getPosition(), finish_point) < 2.0f)
+            {
+                // squared_error = 0.0f;
+                started = false;
+                break;
+            }
+
+            error = hero.eyes.sense(error);
+
+
+            float steering = controller->update({error}, fixed_timestep);
+
+            hero.drive(0.5f, fixed_timestep);
+            hero.steeringTarget = steering;
+
+            warped_time += fixed_timestep;
         }
-
-        error = hero.eyes.sense(error);
-
-        // float raw_error_squared = std::numeric_limits<float>::max();
-        // for (auto &df : gddkia.getDistanceFields())
-        // {
-        // raw_error_squared = std::min((float)std::pow(df->distance(hero.getPosition()), 2), raw_error_squared);
-        // }
-        // squared_error += raw_error_squared;
-        // frames++;
-
-        // float steering = controller->update({error}, fixed_timestep);
-
-        hero.drive(0.5f, deltaT);
-        hero.steeringTarget = steering;
 
         float radius = std::abs(hero.turnRadius());
         float offset = hero.turnOffset();
