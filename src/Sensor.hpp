@@ -4,8 +4,10 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <memory>
 
 #include "Help.hpp"
+#include "DistanceField.hpp"
 
 using sf::CircleShape;
 using sf::RectangleShape;
@@ -29,7 +31,7 @@ public:
   Sensor();
 
   CircleShape dots[width];
-  vector<RectangleShape> lines;
+  vector<std::shared_ptr<DistanceField>> distance_fields;
   array<Vector2f, width> samplePoints;
 
   float sense(float last);

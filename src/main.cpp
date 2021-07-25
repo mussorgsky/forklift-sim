@@ -79,8 +79,7 @@ int main(/* int argc, char *argv[] */)
                 finish_point = gddkia.getFinishPoint();
                 tries++;
             } while (!help::checkNiceTrack(lines, 7.0f));
-            std::cout << "Took " << tries << " tries to get a nice track\n";
-            hero.eyes.lines = lines;
+            hero.eyes.distance_fields = gddkia.getDistanceFields();
             elapsed.restart();
         }
 
@@ -96,7 +95,15 @@ int main(/* int argc, char *argv[] */)
 
         error = hero.eyes.sense(error);
 
-        float steering = controller->update({error}, deltaT);
+        // float raw_error_squared = std::numeric_limits<float>::max();
+        // for (auto &df : gddkia.getDistanceFields())
+        // {
+        // raw_error_squared = std::min((float)std::pow(df->distance(hero.getPosition()), 2), raw_error_squared);
+        // }
+        // squared_error += raw_error_squared;
+        // frames++;
+
+        // float steering = controller->update({error}, fixed_timestep);
 
         hero.drive(0.5f, deltaT);
         hero.steeringTarget = steering;

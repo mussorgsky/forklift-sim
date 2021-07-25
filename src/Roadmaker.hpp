@@ -5,9 +5,11 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <memory>
 
 #include "Help.hpp"
 #include "RoadSegment.hpp"
+#include "SegmentDF.hpp"
 
 using sf::RectangleShape;
 using sf::Vector2f;
@@ -27,6 +29,7 @@ class Roadmaker
 {
 private:
 	vector<RoadSegment> road_segments;
+	vector<std::shared_ptr<DistanceField>> distance_fields;
 	Vector2f position;
 	Vector2f finish_point;
 	float rotation;
@@ -42,4 +45,5 @@ public:
 	void generateSegments(const RoadConfig);
 	vector<RectangleShape> createShapes();
 	Vector2f getFinishPoint();
+	vector<std::shared_ptr<DistanceField>> const &getDistanceFields();
 };

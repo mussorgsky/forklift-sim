@@ -1,3 +1,5 @@
+#include <limits>
+
 #include "Sensor.hpp"
 
 Sensor::Sensor()
@@ -58,28 +60,17 @@ float Sensor::sense(float last)
         Vector2f dotPos = parentPos + help::rotateByDeg(samplePoints[i], parentRot);
         dots[i].setFillColor(sf::Color::Black);
 
-        // for (int l = 0; l < lineCount; l++)
-        // {
-        //     RectangleShape &line = lines[l];
-
-        //     if (help::isInsideRectangle(dotPos, line))
-        //     {
-        //         result += samplePoints[i].x;
-        //         dots[i].setFillColor(sf::Color::White);
-        //         overLine = true;
-        //         seen += 1;
-        //     }
-        // }
-
-        for (RectangleShape line : lines)
+        float distance = std::numeric_limits<float>::max();
+        for (auto &df : distance_fields)
         {
-            if (help::isInsideRectangle(dotPos, line))
-            {
-                result += samplePoints[i].x;
-                dots[i].setFillColor(sf::Color::White);
-                overLine = true;
-                seen += 1;
-            }
+            distance = std::min(distance, df->distance(dotPos));
+        }
+        if (distance <= 1.9f * 0.5f)
+        {
+            result += samplePoints[i].x;
+            dots[i].setFillColor(sf::Color::White);
+            overLine = true;
+            seen += 1;
         }
     }
 

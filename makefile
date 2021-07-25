@@ -2,7 +2,7 @@
 TARGET   = forklift-sim
 
 # compiling flags here
-CXXFLAGS = -O -pedantic -Wall -Wextra
+CXXFLAGS = -std=c++17 -O -pedantic -Wall -Wextra
 
 LINKER   = g++
 # linking flags here

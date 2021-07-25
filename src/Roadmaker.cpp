@@ -2,6 +2,8 @@
 #include <algorithm>
 
 #include "Roadmaker.hpp"
+#include "SegmentDF.hpp"
+#include "ArcDF.hpp"
 
 Roadmaker::Roadmaker()
 {
@@ -18,6 +20,9 @@ void Roadmaker::createStraight(RoadSegment const &segment, vector<RectangleShape
 {
     unsigned int const pieces_count = segment.length / 1.0f;
     float const piece_length = segment.length / pieces_count;
+
+    Vector2f sdf_start = position;
+
     for (unsigned int i = 0; i < pieces_count; ++i)
     {
         RectangleShape shape = RectangleShape(Vector2f(piece_length / 2.0f, 1.9f));
@@ -29,6 +34,8 @@ void Roadmaker::createStraight(RoadSegment const &segment, vector<RectangleShape
 
         shapes.push_back(shape);
     }
+
+    distance_fields.push_back(std::make_shared<SegmentDF>(sdf_start, position));
 }
 
 void Roadmaker::createSkip(RoadSegment const &segment)
@@ -50,6 +57,11 @@ void Roadmaker::createTurn(RoadSegment const &segment, vector<RectangleShape> &s
 
     Vector2f const turnCenter = Vector2f(position + help::rotateByDeg(Vector2f(segment.radius, 0.0f), rotation + sign * 90.0f));
 
+    if (segment.type == SegmentType::TURN_RIGHT)
+    {
+        distance_fields.push_back(std::make_shared<ArcDF>(turnCenter, segment.radius, rotation, segment.degrees));
+    }
+
     for (int i = 0; i < count; i++)
     {
         float x = help::cosineDeg(rotation + sign * (i + 0.5f - 90.0f) * step) * segment.radius;
@@ -64,6 +76,11 @@ void Roadmaker::createTurn(RoadSegment const &segment, vector<RectangleShape> &s
 
     position = turnCenter + help::rotateByDeg(position - turnCenter, sign * segment.degrees);
     rotation += sign * segment.degrees;
+
+    if (segment.type == SegmentType::TURN_LEFT)
+    {
+        distance_fields.push_back(std::make_shared<ArcDF>(turnCenter, segment.radius, rotation + 180.0f, segment.degrees));
+    }
 }
 
 vector<RectangleShape> Roadmaker::createShapes()
@@ -103,6 +120,8 @@ void Roadmaker::generateSegments(RoadConfig const config)
     std::uniform_real_distribution<float> length(config.length_min, config.length_max);
     std::uniform_real_distribution<float> angle(config.angle_min, config.angle_max);
 
+    distance_fields.clear();
+
     if (config.lead_in)
     {
         road_segments.push_back(RoadSegment(SegmentType::STRAIGHT, config.lead_length));
@@ -137,3 +156,7 @@ Vector2f Roadmaker::getFinishPoint()
     return finish_point;
 }
 
+vector<std::shared_ptr<DistanceField>> const &Roadmaker::getDistanceFields()
+{
+    return distance_fields;
+}
