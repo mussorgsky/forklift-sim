@@ -23,4 +23,5 @@ namespace help
     Image makeGridImage(int width, int height);
     float distance(Vector2f const a, Vector2f const b);
     bool checkNiceTrack(std::vector<RectangleShape> &lines, float const margin);
+    float dot(Vector2f const a, Vector2f const b);
 } // namespace help

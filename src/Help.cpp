@@ -85,4 +85,10 @@ namespace help
         }
         return true;
     }
+
+    float dot(Vector2f const a, Vector2f const b)
+    {
+        return (a.x * b.x) + (a.y * b.y);
+    }
+
 } // namespace help
