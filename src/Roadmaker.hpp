@@ -28,6 +28,7 @@ class Roadmaker
 private:
 	vector<RoadSegment> road_segments;
 	Vector2f position;
+	Vector2f finish_point;
 	float rotation;
 
 	void createStraight(RoadSegment const &, vector<RectangleShape> &);
@@ -40,4 +41,5 @@ public:
 	void addSegment(RoadSegment newSegment);
 	void generateSegments(const RoadConfig);
 	vector<RectangleShape> createShapes();
+	Vector2f getFinishPoint();
 };

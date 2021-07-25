@@ -87,6 +87,7 @@ vector<RectangleShape> Roadmaker::createShapes()
             break;
         }
     }
+    finish_point = position;
     position = Vector2f(0.0f, 0.0f);
     rotation = 0.0f;
     road_segments.clear();
@@ -130,3 +131,9 @@ void Roadmaker::generateSegments(RoadConfig const config)
         road_segments.push_back(RoadSegment(SegmentType::STRAIGHT, config.lead_length));
     }
 }
+
+Vector2f Roadmaker::getFinishPoint()
+{
+    return finish_point;
+}
+

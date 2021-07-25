@@ -45,6 +45,7 @@ int main(/* int argc, char *argv[] */)
     vector<RectangleShape> lines;
     float error = 0.0f;
     bool started = false;
+    Vector2f finish_point;
 
     while (window.isOpen())
     {
@@ -75,6 +76,7 @@ int main(/* int argc, char *argv[] */)
             {
                 gddkia.generateSegments(config);
                 lines = gddkia.createShapes();
+                finish_point = gddkia.getFinishPoint();
                 tries++;
             } while (!help::checkNiceTrack(lines, 7.0f));
             std::cout << "Took " << tries << " tries to get a nice track\n";
@@ -84,6 +86,13 @@ int main(/* int argc, char *argv[] */)
 
         sf::View camera = sf::View(hero.getPosition(), Vector2f(200.0f, 200.0f) * 2.0f);
         window.setView(camera);
+
+        if (help::distance(hero.getPosition(), finish_point) < 2.0f)
+        {
+            squared_error = 0.0f;
+            started = false;
+            continue;
+        }
 
         error = hero.eyes.sense(error);
 
