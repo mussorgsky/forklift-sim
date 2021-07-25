@@ -91,4 +91,9 @@ namespace help
         return (a.x * b.x) + (a.y * b.y);
     }
 
+    Vector2f sincosDeg(float angle)
+    {
+        return Vector2f(sineDeg(angle), cosineDeg(angle));
+    }
+
 } // namespace help

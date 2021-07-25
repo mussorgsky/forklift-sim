@@ -24,4 +24,5 @@ namespace help
     float distance(Vector2f const a, Vector2f const b);
     bool checkNiceTrack(std::vector<RectangleShape> &lines, float const margin);
     float dot(Vector2f const a, Vector2f const b);
+    Vector2f sincosDeg(float angle);
 } // namespace help
