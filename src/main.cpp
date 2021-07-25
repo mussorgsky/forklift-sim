@@ -39,7 +39,6 @@ int main(/* int argc, char *argv[] */)
     std::unique_ptr<Controller> controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
 
     hero.rotateBy(-90.0f);
-    hero.wheels[2].rotation = -5.0f;
 
     Roadmaker gddkia;
     RoadConfig config{5, 5, 10, 0, 5.0f, 20.0f, 5.0f, 25.0f, 30.0f, 180.0f, 35.0f, true, true};
@@ -91,7 +90,7 @@ int main(/* int argc, char *argv[] */)
         float steering = controller->update({error}, deltaT);
 
         hero.drive(0.5f, deltaT);
-        hero.steeringTarget = steering + 0.00123f;
+        hero.steeringTarget = steering;
 
         float radius = std::abs(hero.turnRadius());
         float offset = hero.turnOffset();

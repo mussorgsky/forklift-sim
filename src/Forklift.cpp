@@ -61,19 +61,26 @@ void Forklift::drive(float power, float dT)
     turnWheel(dT);
 
     float arclength = 23.5f * power * dT;
-    float circumference = 2.0f * 3.1415f * -turnOffset();
-    float angle = 360.0f * arclength / circumference;
-    float distance = 2.0f * -turnOffset() * help::sineDeg(angle * 0.5f);
 
-    // std::cout << arclength - distance << "\n";
-
-    uint iter = 4;
-    float mult = 1.0f / iter;
-    for (uint i = 0; i < iter; i++)
+    if (wheels[2].rotation == 0.0f)
     {
-        rotateBy(angle * mult);
         Vector2f forward = help::rotateByDeg(Vector2f(0.0f, 1.0f), rotation);
-        moveBy(distance * forward * mult);
+        moveBy(arclength * forward);
+    }
+    else
+    {
+        float circumference = 2.0f * 3.1415f * -turnOffset();
+        float angle = 360.0f * arclength / circumference;
+        float distance = 2.0f * -turnOffset() * help::sineDeg(angle * 0.5f);
+
+        uint iter = 4;
+        float mult = 1.0f / iter;
+        for (uint i = 0; i < iter; i++)
+        {
+            rotateBy(angle * mult);
+            Vector2f forward = help::rotateByDeg(Vector2f(0.0f, 1.0f), rotation);
+            moveBy(distance * forward * mult);
+        }
     }
 }
 
@@ -96,21 +103,25 @@ void Forklift::drive(float power, float dT)
 void Forklift::turnWheel(float dT)
 {
     const float difference = steeringTarget - wheels[2].rotation;
-    const float degsPerSecond = 180.0f;
-    const float maxRot = degsPerSecond * dT * copysignf(1.0f, difference);
 
-    float change;
-
-    if (abs(difference) > abs(maxRot))
+    if (difference != 0.0f)
     {
-        change = maxRot;
-    }
-    else
-    {
-        change = difference;
-    }
+        const float degsPerSecond = 180.0f;
+        const float maxRot = degsPerSecond * dT * copysignf(1.0f, difference);
 
-    wheels[2].rotation += change;
+        float change;
+
+        if (abs(difference) > abs(maxRot))
+        {
+            change = maxRot;
+        }
+        else
+        {
+            change = difference;
+        }
+
+        wheels[2].rotation += change;
+    }
 }
 
 float Forklift::turnOffset()
