@@ -41,7 +41,7 @@ int main(/* int argc, char *argv[] */)
     hero.rotateBy(-90.0f);
 
     Roadmaker gddkia;
-    RoadConfig config{5, 5, 10, 0, 5.0f, 20.0f, 5.0f, 25.0f, 30.0f, 180.0f, 35.0f, true, true};
+    RoadConfig config{5, 5, 10, 0, 5.0f, 20.0f, 5.0f, 25.0f, 30.0f, 180.0f, 75.0f, true, true};
     vector<RectangleShape> lines;
     float error = 0.0f;
     bool started = false;
