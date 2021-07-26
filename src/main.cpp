@@ -47,6 +47,7 @@ int main(/* int argc, char *argv[] */)
     float error = 0.0f;
     bool started = false;
     Vector2f finish_point;
+    float squared_error = 0.0f;
 
     float const fixed_timestep = 0.016f;
     float const target_timewarp = 10.0f;
@@ -97,13 +98,20 @@ int main(/* int argc, char *argv[] */)
         {
             if (help::distance(hero.getPosition(), finish_point) < 2.0f)
             {
-                // squared_error = 0.0f;
+                std::cout << squared_error / (warped_time / fixed_timestep) << "\n";
+                squared_error = 0.0f;
                 started = false;
                 break;
             }
 
             error = hero.eyes.sense(error);
 
+            float raw_error_squared = std::numeric_limits<float>::max();
+            for (auto &df : gddkia.getDistanceFields())
+            {
+                raw_error_squared = std::min((float)std::pow(df->distance(hero.getPosition()), 2), raw_error_squared);
+            }
+            squared_error += raw_error_squared;
 
             float steering = controller->update({error}, fixed_timestep);
 
