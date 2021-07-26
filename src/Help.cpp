@@ -65,21 +65,15 @@ namespace help
         return std::sqrt(std::pow(a.x - b.x, 2) + std::pow(a.y - b.y, 2));
     }
 
-    bool checkNiceTrack(std::vector<RectangleShape> &lines, float const margin)
+    bool checkNiceTrack(std::vector<Vector2f> const &road_path, std::vector<std::shared_ptr<DistanceField>> const &distance_fields)
     {
-        for (size_t head = 0; head < lines.size() - 1; ++head)
+        for (auto &p : road_path)
         {
-            RectangleShape shape = lines[head];
-            std::vector<sf::Vector2f> checkpoints = {shape.getPosition() + help::rotateByDeg(Vector2f(margin, 0.0f), shape.getRotation() + 90.0f),
-                                                     shape.getPosition() + help::rotateByDeg(Vector2f(margin, 0.0f), shape.getRotation() - 90.0f)};
-            for (size_t tail = head + 1; tail < lines.size(); ++tail)
+            for (auto &df : distance_fields)
             {
-                for (auto &checkpoint : checkpoints)
+                if (df->distance(p) < 7.0f)
                 {
-                    if (distance(lines[tail].getPosition(), checkpoint) < margin && distance(lines[tail].getPosition(), lines[head].getPosition()) < margin)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }

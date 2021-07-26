@@ -43,7 +43,7 @@ int main(/* int argc, char *argv[] */)
 
     Roadmaker gddkia;
     RoadConfig config{5, 5, 10, 0, 5.0f, 20.0f, 5.0f, 25.0f, 30.0f, 180.0f, 75.0f, true, true};
-    vector<RectangleShape> lines;
+    vector<Vector2f> road_path;
     float error = 0.0f;
     bool started = false;
     Vector2f finish_point;
@@ -82,10 +82,11 @@ int main(/* int argc, char *argv[] */)
             do
             {
                 gddkia.generateSegments(config);
-                lines = gddkia.createShapes();
+                gddkia.createShapes();
+                road_path = gddkia.getRoadPath();
                 finish_point = gddkia.getFinishPoint();
                 tries++;
-            } while (!help::checkNiceTrack(lines, 7.0f));
+            } while (!help::checkNiceTrack(road_path, gddkia.getDistanceFields()));
             hero.eyes.distance_fields = gddkia.getDistanceFields();
             elapsed.restart();
         }
@@ -128,9 +129,10 @@ int main(/* int argc, char *argv[] */)
 
         window.draw(background);
 
-        for (RectangleShape line : lines)
+        vector<vector<Vertex>> road_vertices = gddkia.getRoadVertices();
+        for (auto &rv : road_vertices)
         {
-            window.draw(line);
+            window.draw(&rv[0], rv.size(), sf::TriangleStrip);
         }
 
         float parentRot = hero.getRotation();

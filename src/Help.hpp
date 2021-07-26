@@ -4,6 +4,9 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <cmath>
+#include <memory>
+
+#include "DistanceField.hpp"
 
 using sf::Color;
 using sf::Image;
@@ -22,7 +25,7 @@ namespace help
     bool isInsideRectangle(Vector2f point, RectangleShape rectangle);
     Image makeGridImage(int width, int height);
     float distance(Vector2f const a, Vector2f const b);
-    bool checkNiceTrack(std::vector<RectangleShape> &lines, float const margin);
+    bool checkNiceTrack(std::vector<Vector2f> const &road_path, std::vector<std::shared_ptr<DistanceField>> const &distance_fields);
     float dot(Vector2f const a, Vector2f const b);
     Vector2f sincosDeg(float angle);
 } // namespace help
