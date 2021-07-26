@@ -36,8 +36,8 @@ int main(/* int argc, char *argv[] */)
     sf::Clock delta;
     sf::Clock elapsed;
 
-    Forklift hero = Forklift();
-    std::unique_ptr<Controller> controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
+    Forklift hero;
+    std::unique_ptr<Controller> controller;
 
     hero.rotateBy(-90.0f);
 
@@ -67,11 +67,11 @@ int main(/* int argc, char *argv[] */)
         float deltaT = delta.restart().asSeconds();
         float elapsedT = elapsed.getElapsedTime().asSeconds();
 
-        if (!started || elapsedT > 6.0f)
+        if (!started || warped_time > 120.0f)
         {
             started = true;
             hero = Forklift();
-            controller = std::make_unique<PID>(10.0f, 0.25f, 4.0f);
+            controller = std::make_unique<PID>(12.0f, 0.25f, 4.0f);
 
             hero.rotateBy(-90.0f);
             hero.wheels[2].rotation = -5.0f;
