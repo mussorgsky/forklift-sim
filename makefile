@@ -6,7 +6,7 @@ CXXFLAGS = -std=c++17 -O -pedantic -Wall -Wextra
 
 LINKER   = g++
 # linking flags here
-LFLAGS   = -lsfml-system -lsfml-window -lsfml-graphics
+LFLAGS   = -ltensorflow -lsfml-system -lsfml-window -lsfml-graphics
 
 # change these to proper directories where each file should be
 SRCDIR   = src
