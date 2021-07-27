@@ -3,6 +3,8 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
+#include <fstream>
+
 #include "cppflow/cppflow.h"
 #include "Help.hpp"
 #include "Forklift.hpp"
@@ -14,8 +16,55 @@ PAMIETĘTAJ ŻEBY SIĘ NIE BAWIĆ W MEGA OGÓLNE ROZWIĄZANIA
 TO JEST JEDNOZADANIOWY PROGRAM
 */
 
-int main(/* int argc, char *argv[] */)
+int main(int argc, char *argv[])
 {
+    if (argc == 3)
+    {
+        std::string const operation(argv[1]);
+        if (operation == "--generate")
+        {
+            std::string const config_filename(argv[2]);
+            std::ifstream config_file;
+            config_file.open(config_filename, std::ios::in);
+            if (config_file.good())
+            {
+                bool failed = false;
+                GenerationConfig gen_conf = Roadmaker::loadGenerationConfig(config_file, failed);
+                config_file.close();
+
+                if (failed)
+                {
+                    std::cout << "Generation config file is not correct.\n";
+                    return 1;
+                }
+
+                Roadmaker roadmaker;
+                vector<Vector2f> road_path;
+                vector<vector<RoadSegment>> roads;
+                for (unsigned int i = 0; i < gen_conf.track_count; ++i)
+                {
+                    do
+                    {
+                        roadmaker.generateSegments(gen_conf.config);
+                        roadmaker.createShapes();
+                    } while (!help::checkNiceTrack(roadmaker.getRoadPath(), roadmaker.getDistanceFields()));
+
+                    roads.push_back(roadmaker.getRoadSegments());
+                }
+                if (!help::saveToFile(roads, gen_conf.name))
+                {
+                    std::cout << "Cannot save generated roads.\n";
+                }
+
+                return 0;
+            }
+            else
+            {
+                std::cout << "Cannot open configuration file.\n";
+                return 1;
+            }
+        }
+    }
     int width = 800;
     int height = 800;
     sf::ContextSettings settings;

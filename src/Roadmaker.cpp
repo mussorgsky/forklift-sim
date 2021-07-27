@@ -171,6 +171,11 @@ vector<Vector2f> const &Roadmaker::getRoadPath()
     return road_path;
 }
 
+vector<RoadSegment> const Roadmaker::getRoadSegments()
+{
+    return road_segments;
+}
+
 void Roadmaker::reset()
 {
     road_segments.clear();
@@ -183,4 +188,32 @@ void Roadmaker::reset()
     road_path.clear();
     position = Vector2f(0.0f, 0.0f);
     rotation = 0.0f;
+}
+
+GenerationConfig Roadmaker::loadGenerationConfig(std::ifstream &file, bool &failed)
+{
+    vector<string> lines;
+    while (!file.eof())
+    {
+        lines.push_back({});
+        std::getline(file, lines.back());
+    }
+
+    auto const name = help::getConfigProperty<string>("name", lines, "unnamed", failed);
+    auto const track_count = help::getConfigProperty<unsigned int>("track_count", lines, 0, failed);
+    auto const turns_left = help::getConfigProperty<unsigned int>("turns_left", lines, 0, failed);
+    auto const turns_right = help::getConfigProperty<unsigned int>("turns_right", lines, 0, failed);
+    auto const straights = help::getConfigProperty<unsigned int>("straights", lines, 0, failed);
+    auto const skips = help::getConfigProperty<unsigned int>("skips", lines, 0, failed);
+    auto const radius_min = help::getConfigProperty<float>("radius_min", lines, 10, failed);
+    auto const radius_max = help::getConfigProperty<float>("radius_max", lines, 10, failed);
+    auto const length_min = help::getConfigProperty<float>("length_min", lines, 10, failed);
+    auto const length_max = help::getConfigProperty<float>("length_max", lines, 10, failed);
+    auto const angle_min = help::getConfigProperty<float>("angle_min", lines, 10, failed);
+    auto const angle_max = help::getConfigProperty<float>("angle_max", lines, 10, failed);
+    auto const lead_length = help::getConfigProperty<float>("lead_length", lines, 10, failed);
+    auto const lead_in = help::getConfigProperty<bool>("lead_in", lines, false, failed);
+    auto const lead_out = help::getConfigProperty<bool>("lead_out", lines, false, failed);
+
+    return GenerationConfig{name, track_count, {turns_left, turns_right, straights, skips, radius_min, radius_max, length_min, length_max, angle_min, angle_max, lead_length, lead_in, lead_out}};
 }

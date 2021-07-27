@@ -90,4 +90,53 @@ namespace help
         return Vector2f(sineDeg(angle), cosineDeg(angle));
     }
 
+    bool saveToFile(std::vector<std::vector<RoadSegment>> &road_segment_vectors, std::string const &filename)
+    {
+        std::ofstream file;
+        file.open(filename, std::ios::out | std::ios::trunc | std::ios::binary);
+        if (file.good())
+        {
+            uint16_t segment_vector_count = road_segment_vectors.size();
+            file.write((char *)&segment_vector_count, sizeof(uint16_t));
+            for (auto &rsv : road_segment_vectors)
+            {
+                uint16_t size = rsv.size();
+                file.write((char *)&size, sizeof(size));
+                file.write((char *)rsv.data(), size * sizeof(RoadSegment));
+            }
+        }
+        else
+        {
+            return false;
+        }
+        file.close();
+        return true;
+    }
+
+    std::vector<std::vector<RoadSegment>> loadFromFile(std::string const &filename)
+    {
+        std::ifstream file;
+        file.open(filename, std::ios::in | std::ios::binary);
+        std::vector<std::vector<RoadSegment>> result;
+        if (file.good())
+        {
+            uint16_t segment_vector_count;
+            file.read((char *)&segment_vector_count, sizeof(uint16_t));
+            for (int i = 0; i < segment_vector_count; ++i)
+            {
+                uint16_t size;
+                file.read((char *)&size, sizeof(size));
+                std::vector<RoadSegment> segments;
+                for (int i = 0; i < size; ++i)
+                {
+                    RoadSegment rs;
+                    file.read((char *)&rs, sizeof(rs));
+                    segments.push_back(rs);
+                }
+                result.push_back(segments);
+            }
+        }
+        return result;
+    }
+
 } // namespace help

@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 #include <memory>
+#include <fstream>
 
 #include "Help.hpp"
 #include "RoadSegment.hpp"
@@ -23,6 +24,13 @@ struct RoadConfig
 	unsigned int const turns_left, turns_right, straights, skips;
 	float const radius_min, radius_max, length_min, length_max, angle_min, angle_max, lead_length;
 	bool lead_in, lead_out;
+};
+
+struct GenerationConfig
+{
+	string const name;
+	unsigned int const track_count;
+	RoadConfig const config;
 };
 
 class Roadmaker
@@ -55,5 +63,8 @@ public:
 	vector<std::shared_ptr<DistanceField>> const &getDistanceFields();
 	vector<vector<Vertex>> const &getRoadVertices();
 	vector<Vector2f> const &getRoadPath();
+	vector<RoadSegment> const getRoadSegments();
 	void reset();
+
+	static GenerationConfig loadGenerationConfig(std::ifstream &file, bool &failed);
 };

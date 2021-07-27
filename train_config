@@ -1,0 +1,15 @@
+name=training_data
+track_count=1000
+turns_left=5
+turns_right=5
+straights=10
+skips=0
+radius_min=5.0
+radius_max=20.0
+length_min=5.0
+length_max=25.0
+angle_min=30.0
+angle_max=180.0
+lead_length=75.0
+lead_in=1
+lead_out=1
