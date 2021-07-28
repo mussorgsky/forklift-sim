@@ -9,12 +9,15 @@
 #include "Help.hpp"
 #include "Forklift.hpp"
 #include "PID.hpp"
+#include "NNController.hpp"
 #include "Roadmaker.hpp"
 
 /*
 PAMIETĘTAJ ŻEBY SIĘ NIE BAWIĆ W MEGA OGÓLNE ROZWIĄZANIA
 TO JEST JEDNOZADANIOWY PROGRAM
 */
+
+float calculateLoss(std::shared_ptr<Controller> const &controller, std::vector<RoadSegment> const &road_segments);
 
 int main(int argc, char *argv[])
 {
@@ -64,6 +67,43 @@ int main(int argc, char *argv[])
                 return 1;
             }
         }
+    }
+    if (argc == 4)
+    {
+        std::string const operation(argv[1]);
+        if (operation == "test")
+        {
+            std::string const model_filename(argv[2]);
+            std::string const roads_filename(argv[3]);
+
+            cppflow::model model(model_filename);
+            std::shared_ptr<Controller> controller = std::make_shared<NNController>(model);
+            std::vector<std::vector<RoadSegment>> rsv = help::loadFromFile(roads_filename);
+
+            std::vector<float> losses;
+            for (auto &road_segments : rsv)
+            {
+                losses.push_back(calculateLoss(controller, road_segments));
+            }
+
+            std::ofstream loss_file;
+            loss_file.open("losses", std::ios::out | std::ios::trunc);
+            if (loss_file.good())
+            {
+                for (auto loss : losses)
+                {
+                    loss_file << loss << "\n";
+                }
+            }
+            loss_file.close();
+
+            return 0;
+        }
+    }
+    if (argc != 1)
+    {
+        std::cout << "Invalid arguments.\n";
+        return 1;
     }
     int width = 800;
     int height = 800;
@@ -221,4 +261,68 @@ int main(int argc, char *argv[])
     }
 
     return 0;
+}
+
+float calculateLoss(std::shared_ptr<Controller> const &controller, std::vector<RoadSegment> const &road_segments)
+{
+    float error = 0.0f;
+    bool started = false;
+    Vector2f finish_point;
+    float squared_error = 0.0f;
+    float steering = 0.0f;
+
+    float const fixed_timestep = 0.01f;
+    float warped_time = 0.0f;
+
+    Forklift forky;
+
+    forky.rotateBy(-90.0f);
+
+    std::vector<float> error_memory(200);
+
+    warped_time = 0.0f;
+    Roadmaker gddkia;
+    for (auto &rs : road_segments)
+    {
+        gddkia.addSegment(rs);
+    }
+    gddkia.createShapes();
+    finish_point = gddkia.getFinishPoint();
+    forky.eyes.distance_fields = gddkia.getDistanceFields();
+
+    while (warped_time < 120.0f)
+    {
+        error = forky.eyes.sense(error);
+        error_memory.pop_back();
+        error_memory.insert(error_memory.begin(), error);
+
+        float raw_error_squared = std::numeric_limits<float>::max();
+        for (auto &df : gddkia.getDistanceFields())
+        {
+            raw_error_squared = std::min((float)std::pow(df->distance(forky.getPosition()), 2), raw_error_squared);
+        }
+        squared_error += raw_error_squared;
+
+        steering = controller->update({error,
+                                       error_memory,
+                                       steering,
+                                       forky.getWheelAngle()},
+                                      fixed_timestep);
+
+        forky.drive(0.5f, fixed_timestep);
+        forky.steeringTarget = steering;
+
+        warped_time += fixed_timestep;
+
+        if (help::distance(forky.getPosition(), finish_point) < 2.0f)
+        {
+            float mean_squared_error = squared_error / (warped_time / fixed_timestep);
+            std::cout << mean_squared_error << "\n";
+            return mean_squared_error;
+        }
+    }
+
+    float mean_squared_error = squared_error / (warped_time / fixed_timestep);
+    std::cout << mean_squared_error << "\n";
+    return mean_squared_error;
 }
