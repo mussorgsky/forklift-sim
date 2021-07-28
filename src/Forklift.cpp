@@ -119,3 +119,8 @@ float Forklift::turnRadius()
     float b = wheels[0].position.y - wheels[2].position.y;
     return b / help::sineDeg(wheels[2].rotation);
 }
+
+float Forklift::getWheelAngle()
+{
+    return wheels[2].rotation;
+}

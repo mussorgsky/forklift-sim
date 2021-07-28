@@ -37,4 +37,5 @@ public:
   void drive(float power, float dT);
   float turnOffset();
   float turnRadius();
+  float getWheelAngle();
 };
